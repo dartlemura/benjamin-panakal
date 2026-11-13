@@ -1,0 +1,55 @@
+---
+import Base from '../layouts/Base.astro';
+import { person, data, locationLabel, link } from '../data/site';
+
+const title = `Contact — ${person.name}`;
+const description = `How to contact ${person.name}, based in ${locationLabel}. Verified contact channels only.`;
+const path = '/contact/';
+const crumbs = [{ name: 'Home', path: '/' }, { name: 'Contact', path }];
+const email = data.contact.email;
+---
+<Base {title} heading={`Contact — ${person.name}`} {description} {path} kind="contact" breadcrumbs={crumbs}>
+  <section class="page-head">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <ol>
+          <li><a href={link('/')}>Home</a></li>
+          <li><span aria-current="page">Contact</span></li>
+        </ol>
+      </nav>
+      <h1 class="h1">Contact <span class="sub"><span class="visually-hidden">with </span>{person.name}</span></h1>
+      <p class="lead">Only verified channels are listed here, so you always reach the real person.</p>
+    </div>
+  </section>
+
+  <div class="beam" aria-hidden="true"></div>
+
+  <section class="section" style="border-top:0">
+    <div class="wrap split">
+      <div class="side side--sub">
+        <p class="eyebrow">Channels</p>
+        <p class="muted">Based in {locationLabel}.</p>
+      </div>
+      <div class="main">
+        {email && (
+          <div class="contact-card" style="margin-bottom:16px">
+            <p class="eyebrow">Email</p>
+            <p class="big"><a href={`mailto:${email}`}>{email}</a></p>
+          </div>
+        )}
+        {person.profiles.map((p) => (
+          <div class="contact-card">
+            <p class="eyebrow">{p.label}</p>
+            <p class="big">{p.handle}</p>
+            <p class="note">Send a message on {p.label}. This is the profile linked from this website.</p>
+            <a class="btn" href={p.url} rel="me noopener" target="_blank">
+              Open {p.label}
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 11 11 5M6 5h5v5"/></svg>
+              <span class="visually-hidden">(opens in a new tab)</span>
+            </a>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+</Base>

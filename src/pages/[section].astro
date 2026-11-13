@@ -1,0 +1,128 @@
+---
+import Base from '../layouts/Base.astro';
+import { listNode } from '../lib/schema';
+import { person, data, liveSections, formatDate, clip, link } from '../data/site';
+
+/** Only sections that have verified entries get a page. No entries = no page. */
+export function getStaticPaths() {
+  return liveSections.map((s) => ({ params: { section: s.slug }, props: { key: s.key } }));
+}
+
+const { section } = Astro.params;
+const def = liveSections.find((s) => s.slug === section)!;
+const path = `/${def.slug}/`;
+const entries = data[def.key] as any[];
+
+const title = `${def.label} — ${person.name}`;
+
+let description: string;
+if (def.kind === 'prose') {
+  description = clip(entries[0]);
+} else if (def.kind === 'gallery') {
+  description = clip(`Photographs of ${person.name}. ${entries.length} image${entries.length === 1 ? '' : 's'}.`);
+} else {
+  const names = entries.map((e) => e.title).join(', ');
+  description = clip(`${def.label} of ${person.name}: ${names}.`);
+}
+
+const extra: Record<string, unknown>[] = [];
+if (def.key === 'articles') {
+  extra.push(listNode(path, entries.map((a) => ({ name: a.title, url: a.url, description: a.summary, datePublished: a.date }))));
+}
+if (def.key === 'projects') {
+  extra.push(listNode(path, entries.map((p) => ({ name: p.title, url: p.url, description: p.summary }))));
+}
+
+const kind = def.kind === 'prose' ? 'webpage' : 'collection';
+const crumbs = [{ name: 'Home', path: '/' }, { name: def.label, path }];
+---
+<Base {title} heading={`${def.label} — ${person.name}`} {description} {path} {kind} breadcrumbs={crumbs} extraNodes={extra}>
+  <section class="page-head">
+    <div class="wrap">
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <ol>
+          <li><a href={link('/')}>Home</a></li>
+          <li><span aria-current="page">{def.label}</span></li>
+        </ol>
+      </nav>
+      <h1 class="h1">{def.label} <span class="sub"><span class="visually-hidden">of </span>{person.name}</span></h1>
+      {def.kind !== 'prose' && <p class="lead">{def.blurb}</p>}
+    </div>
+  </section>
+
+  <div class="beam" aria-hidden="true"></div>
+
+  <section class="section" style="border-top:0">
+    <div class="wrap split">
+      <div class="side side--sub">
+        <p class="eyebrow">{def.label}</p>
+        <p class="muted">{person.name}</p>
+      </div>
+      <div class="main">
+        {def.kind === 'prose' && (
+          <div class="prose">
+            {entries.map((p: string) => <p>{p}</p>)}
+          </div>
+        )}
+
+        {def.kind === 'timeline' && (
+          <ol class="timeline">
+            {entries.map((e) => (
+              <li class="reveal">
+                <span class="when">{e.period ?? ''}</span>
+                <div>
+                  <h2 class="h3">{e.url ? <a href={e.url} rel="noopener" target="_blank">{e.title}</a> : e.title}</h2>
+                  {e.org && <p class="org">{e.org}</p>}
+                  {e.summary && <p>{e.summary}</p>}
+                </div>
+              </li>
+            ))}
+          </ol>
+        )}
+
+        {def.kind === 'cards' && (
+          <ul class="cards">
+            {entries.map((e) => (
+              <li class="card reveal">
+                {e.period && <span class="meta">{e.period}</span>}
+                <h2 class="h3">{e.title}</h2>
+                {e.summary && <p>{e.summary}</p>}
+                {e.url && <a class="more" href={e.url} rel="noopener" target="_blank">View project <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></a>}
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {def.kind === 'articles' && (
+          <ol class="articles">
+            {entries.map((a) => (
+              <li class="article reveal">
+                <div>
+                  {a.date && <time datetime={a.date}>{formatDate(a.date)}</time>}
+                  {a.publisher && <p class="pub">{a.publisher}</p>}
+                </div>
+                <div>
+                  <h2 class="h3"><a href={a.url} rel="noopener" target="_blank">{a.title}</a></h2>
+                  {a.summary && <p>{a.summary}</p>}
+                </div>
+              </li>
+            ))}
+          </ol>
+        )}
+
+        {def.kind === 'gallery' && (
+          <ul class="gallery">
+            {entries.map((g, i) => (
+              <li>
+                <figure>
+                  <img src={g.src.startsWith('/') ? link(g.src) : g.src} alt={g.alt} width={g.width} height={g.height} loading={i < 2 ? 'eager' : 'lazy'} decoding="async" />
+                  {g.caption && <figcaption>{g.caption}</figcaption>}
+                </figure>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  </section>
+</Base>

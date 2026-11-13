@@ -1,0 +1,14 @@
+---
+import Base from '../layouts/Base.astro';
+import { person, link } from '../data/site';
+---
+<Base title={`Page not found — ${person.name}`} heading="Page not found" description={`This page does not exist. Return to the official website of ${person.name}.`} path="/404/" noindex>
+  <section class="page-head">
+    <div class="wrap">
+      <p class="eyebrow"><span class="dot" aria-hidden="true"></span> 404</p>
+      <h1 class="h1" style="margin-top:24px">This page doesn’t exist.</h1>
+      <p class="lead">The link may be old, or the section hasn’t been published yet.</p>
+      <a class="btn" href={link('/')}>Back to home</a>
+    </div>
+  </section>
+</Base>
