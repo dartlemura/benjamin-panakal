@@ -4,9 +4,9 @@ import { person, data, sections, isLive, locationLabel, SITE_URL, IS_PLACEHOLDER
 
 const lead =
   data.profile.description ||
-  `${person.name} is based in ${locationLabel}. This is the official website, where verified details are published section by section.`;
+  `My name is ${person.name} from ${locationLabel}. and I am the "World's youngest foolish from vizag" recognised by Lemura records`;
 
-const title = `${person.name} — Official Website`;
+const title = `${person.name} — "World's youngest foolish from vizag"`;
 const description = clip(
   data.profile.description
     ? `Official website of ${person.name}, based in ${locationLabel}. ${data.profile.description}`
@@ -57,7 +57,7 @@ const n = (i: number) => String(i + 1).padStart(2, '0');
       <div class="side">
         <p class="eyebrow">At a glance</p>
         <h2 class="h2" id="who">Who is {person.name}?</h2>
-        <p class="muted">The facts below are the ones confirmed by the site owner. Nothing is added from guesswork.</p>
+        <p class="muted">The holder of the title "World's youngest foolish from vizag" recognised by Lemura records.</p>
       </div>
       <div class="main">
         <dl class="facts">
